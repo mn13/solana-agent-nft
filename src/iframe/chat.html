@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>__AGENT_NAME__</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a0a;
+      color: #e0e0e0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      padding: 12px 16px;
+      background: #141414;
+      border-bottom: 1px solid #2a2a2a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header h1 {
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .header button {
+      background: #7c3aed;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .header button:hover { background: #6d28d9; }
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .msg {
+      max-width: 80%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      line-height: 1.5;
+      font-size: 14px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    .msg.user {
+      align-self: flex-end;
+      background: #7c3aed;
+      color: white;
+    }
+    .msg.assistant {
+      align-self: flex-start;
+      background: #1e1e1e;
+      color: #e0e0e0;
+    }
+    .msg.typing {
+      opacity: 0.6;
+      font-style: italic;
+    }
+    .welcome {
+      text-align: center;
+      color: #666;
+      margin-top: 40px;
+      font-size: 14px;
+    }
+    .input-area {
+      padding: 12px 16px;
+      background: #141414;
+      border-top: 1px solid #2a2a2a;
+      display: flex;
+      gap: 8px;
+    }
+    .input-area input {
+      flex: 1;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid #333;
+      background: #1a1a1a;
+      color: white;
+      font-size: 14px;
+      outline: none;
+    }
+    .input-area input:focus { border-color: #7c3aed; }
+    .input-area input::placeholder { color: #666; }
+    .input-area button {
+      background: #7c3aed;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .input-area button:hover { background: #6d28d9; }
+    .input-area button:disabled { opacity: 0.5; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>__AGENT_NAME__</h1>
+    <button onclick="openFullPage()">Open Full Chat</button>
+  </div>
+  <div class="messages" id="messages">
+    <div class="welcome">Send a message to start chatting</div>
+  </div>
+  <div class="input-area">
+    <input id="input" placeholder="Ask the agent..." onkeydown="if(event.key==='Enter'&&!event.shiftKey)send()">
+    <button id="sendBtn" onclick="send()">Send</button>
+  </div>
+
+  <script>
+    var API = "__API_BASE_URL__";
+    var ASSET = "__ASSET_ID__";
+    var messages = [];
+    var loading = false;
+
+    function escapeHtml(t) {
+      return t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    }
+
+    function renderMessages() {
+      var el = document.getElementById("messages");
+      if (messages.length === 0) {
+        el.innerHTML = '<div class="welcome">Send a message to start chatting</div>';
+        return;
+      }
+      var html = messages.map(function(m) {
+        return '<div class="msg ' + m.role + '">' + escapeHtml(m.content) + '</div>';
+      }).join("");
+      if (loading) {
+        html += '<div class="msg assistant typing">Thinking...</div>';
+      }
+      el.innerHTML = html;
+      el.scrollTop = el.scrollHeight;
+    }
+
+    function send() {
+      var input = document.getElementById("input");
+      var text = input.value.trim();
+      if (!text || loading) return;
+      input.value = "";
+      messages.push({ role: "user", content: text });
+      loading = true;
+      renderMessages();
+      document.getElementById("sendBtn").disabled = true;
+
+      fetch(API + "/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ assetId: ASSET, messages: messages })
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        if (data.reply) {
+          messages.push({ role: "assistant", content: data.reply });
+        } else {
+          messages.push({ role: "assistant", content: "Error: " + (data.error || "Unknown error") });
+        }
+      })
+      .catch(function() {
+        messages.push({ role: "assistant", content: "Connection error. Try the full page view." });
+      })
+      .finally(function() {
+        loading = false;
+        document.getElementById("sendBtn").disabled = false;
+        renderMessages();
+        document.getElementById("input").focus();
+      });
+    }
+
+    function openFullPage() {
+      window.open(API + "/agent/" + ASSET, "_blank");
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "agent-nft-demo-agent",
+  "version": "1.0.0",
+  "description": "Demo Solana knowledge agent for Agent NFT",
+  "scripts": {
+    "start": "npx tsx index.ts"
+  },
+  "dependencies": {
+    "express": "^4.21.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.0.0",
+    "@types/express": "^5.0.0",
+    "@types/node": "^20.0.0"
+  }
+}
