@@ -64,7 +64,7 @@ This creates a new primitive: **agents as first-class on-chain assets**.
 ### 1. Clone & Install
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/agent-nft.git
+git clone https://github.com/mn13/solana-agent-nft.git
 cd agent-nft
 npm install
 cd demo-agent && npm install && cd ..
@@ -385,8 +385,7 @@ Submission link: https://superteam.fun/earn/listing/open-innovation-track-agents
 
 ## Links
 
-- **GitHub**: https://github.com/YOUR_USERNAME/agent-nft
-- **Live Demo**: https://agent-nft.vercel.app
+- **GitHub**: https://github.com/mn13/solana-agent-nft
 - **Specification**: [SPEC.md](./SPEC.md)
 - **Testing Guide**: [TESTING.md](./TESTING.md)
 - **Implementation Plan**: [IMPLEMENTATION.md](./IMPLEMENTATION.md)
@@ -399,7 +398,7 @@ Contributions are welcome! Please open an issue or PR.
 
 ## Support
 
-For issues and questions, please use GitHub Issues: https://github.com/YOUR_USERNAME/agent-nft/issues
+For issues and questions, please use GitHub Issues: https://github.com/mn13/solana-agent-nft/issues
 
 ---
 
