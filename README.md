@@ -29,7 +29,7 @@ This creates a new primitive: **agents as first-class on-chain assets**.
 ```
 ┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
 │  Magic Eden       │     │  Next.js App      │     │  Agent Endpoint   │
-│  (NFT detail)     │     │  (Vercel)         │     │  (any provider)   │
+│  (NFT detail)     │     │  (local/deploy)   │     │  (any provider)   │
 │                   │     │                   │     │                   │
 │  ┌─────────────┐  │     │  /api/chat ───────┼────►│  /v1/chat/compl.  │
 │  │ iframe      │──┼────►│  /api/auth/nonce  │     │  or POST webhook  │
@@ -65,7 +65,7 @@ This creates a new primitive: **agents as first-class on-chain assets**.
 
 ```bash
 git clone https://github.com/mn13/solana-agent-nft.git
-cd agent-nft
+cd solana-agent-nft
 npm install
 cd demo-agent && npm install && cd ..
 ```
@@ -240,9 +240,11 @@ src/
 │       ├── chat/route.ts          # Auth check + proxy to agent
 │       ├── upload/route.ts        # Upload image+HTML to Arweave
 │       ├── upload-json/route.ts   # Upload JSON metadata to Arweave
-│       └── agent-info/route.ts    # Fetch agent metadata
+│       ├── agent-info/route.ts    # Fetch agent metadata
+│       └── irys-status/route.ts   # Irys node status check
 ├── components/
 │   ├── WalletProvider.tsx         # Solana wallet context
+│   ├── WalletButton.tsx           # Wallet connect button
 │   ├── MintForm.tsx               # NFT minting form
 │   └── ChatWindow.tsx             # Chat UI component
 ├── lib/
@@ -272,7 +274,7 @@ Each Agent NFT follows the Metaplex standard with custom attributes:
   "description": "...",
   "image": "https://arweave.net/{imageId}",
   "animation_url": "https://arweave.net/{htmlId}",
-  "external_url": "https://agent-nft.vercel.app/agent/{assetId}",
+  "external_url": "https://your-app-url.com/agent/{assetId}",
   "attributes": [
     { "trait_type": "agent_endpoint", "value": "https://my-agent.com/v1/chat/completions" },
     { "trait_type": "agent_type", "value": "openai" },
@@ -332,39 +334,21 @@ See [TESTING.md](./TESTING.md) for a comprehensive step-by-step testing guide co
 
 ## Deployment
 
-### Next.js App (Vercel)
+The app currently runs locally. To deploy to production, you can use any Node.js hosting platform:
 
-```bash
-# Push to GitHub
-git push origin main
+### Next.js App
 
-# Deploy on Vercel
-vercel deploy --prod
+Deploy to Vercel, Railway, Render, or any platform that supports Next.js. Set the environment variables from `.env.local` in your hosting dashboard and update `NEXT_PUBLIC_APP_URL` to your production URL.
 
-# Update .env.local variables in Vercel dashboard
-# Set NEXT_PUBLIC_APP_URL to your Vercel URL
-```
-
-### Demo Agent (Railway/Render/Fly.io)
+### Demo Agent
 
 Deploy the `demo-agent` folder to any Node.js hosting platform. Set `PORT` env var if required.
-
-**Railway:**
-```bash
-cd demo-agent
-railway up
-```
-
-**Render:**
-1. Connect GitHub repo
-2. Build command: `npm install`
-3. Start command: `npm start`
 
 ---
 
 ## License
 
-MIT License - see [LICENSE](./LICENSE) file for details.
+MIT License.
 
 ---
 
@@ -377,7 +361,6 @@ Submission link: https://superteam.fun/earn/listing/open-innovation-track-agents
 **Deliverables:**
 - ✅ GitHub repo (public, MIT license)
 - ✅ README with architecture, setup, and usage
-- ✅ Hosted app (Vercel)
 - ✅ Demo Agent NFT (minted on devnet, viewable on Magic Eden)
 - ✅ "Built by AI" documentation
 
